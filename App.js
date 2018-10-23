@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {Scene, Router} from 'react-native-router-flux';
 import Search from './src/components/Search'
 
-
 export default class App extends Component{
   render() {
     return (
