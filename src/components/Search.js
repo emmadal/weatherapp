@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, ImageBackground} from 'react-native';
-import {Container, Item, Input, Content, Button, Icon, Spinner} from 'native-base'
+import {StyleSheet, Text, ImageBackground, ActivityIndicator, Alert} from 'react-native';
+import {Container, Item, Input, Content, Button, Icon} from 'native-base'
 import Localisation from '../components/Localisation'
 import WeatherType from '../components/WeatherType'
+import WeatherDetails from '../components/WeatherDetails'
 import axios from 'axios'
 
 export default class Search extends Component{
@@ -13,20 +14,28 @@ export default class Search extends Component{
       city:'',
       country:'',
       region:'',
-      textcondition:'',
+      text:'',
       isLoading:false,
       error:'',
-      ic:'',
+      icon:'',
+      maxtemp_c:0,
+      wind_kph:0,
+      humidity:0,
+      last_updated:'',
+      wind_degree:0,
       arraylocation:[],
-      arraycurrent:[]
     }
     this._Search = this._Search.bind(this)
   }
   async _Search(){
+
     const arraylocation = []
     const arraycurrent = []
+    const arrayforecast = []
     try {
+      this.setState({isLoading:true})
       const res = await axios.get(`https://api.apixu.com/v1/forecast.json?key=6374bda99ff940cd814182449182210&q=${this.state.mycity}`)
+      res.status == 200 ? this.setState({isLoading:false}) : this.setState({isLoading:false})
       arraylocation.push(res.data.location)
       this.setState({arraylocation})
       arraylocation.map((text) =>{
@@ -36,18 +45,18 @@ export default class Search extends Component{
           region:text.region
         })
       })
-      arraycurrent.push(res.data.current.condition)
-      this.setState({arraycurrent})
-      arraycurrent.map((text) =>{
-        this.setState({
-          textcondition:text.text,
-          ic:text.icon,
-        })
-      })
-      console.log(res.data)
+      const {wind_kph, humidity, wind_degree, last_updated, last_updated_epoch} = res.data.current
+      const {maxtemp_c} = res.data.forecast.forecastday[0].day
+      const {text, icon } = res.data.forecast.forecastday[0].day.condition
+      this.setState({wind_kph,humidity,text, icon, maxtemp_c, wind_degree, last_updated})
     } catch(e){
       this.setState({error:e.message})
-      alert(this.state.error)
+      Alert.alert(
+        'Error Getting Weather',
+        `${this.state.error}`,
+        [{text:'Try again'}],
+        {cancelable:false}
+      )
     }
   }
   render() {
@@ -74,15 +83,15 @@ export default class Search extends Component{
           </Button>
           <Container style={{backgroundColor:'transparent'}}>
             <Localisation city={this.state.city} country={this.state.country}
-              region={this.state.region}
+              region={this.state.region} temp_c={this.state.temp_c} isLoading={this.state.isLoading}
             />
 
           </Container>
-          <WeatherType textcondition={this.state.textcondition}
-            ic={this.state.ic}
+          <WeatherType text={this.state.text}
+            icon={this.state.icon} maxtemp_c={this.state.maxtemp_c} isLoading={this.state.isLoading}
           />
-          <WeatherType textcondition={this.state.textcondition}
-            ic={this.state.ic}
+          <WeatherDetails wind_kph={this.state.wind_kph} humidity={this.state.humidity}
+            wind_degree={this.state.wind_degree} last_updated={this.state.last_updated} isLoading={this.state.isLoading}
           />
       </ImageBackground>
     );
@@ -113,5 +122,5 @@ const styles = StyleSheet.create({
     textAlign:'center',
     marginLeft:80,
     fontWeight:"bold"
-  }
+  },
 })

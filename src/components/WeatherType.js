@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, Image} from 'react-native';
+import {StyleSheet, Text, Image, ActivityIndicator} from 'react-native';
 import {Container} from 'native-base'
 
 export default class WeatherType extends Component{
@@ -7,10 +7,18 @@ export default class WeatherType extends Component{
     super(props)
   }
   render() {
+    if(this.props.isLoading){
+      return(
+        <ActivityIndicator size="large" color="white" animating={this.props.isLoading}
+          style={styles.spinner}
+        />
+      )
+    }
     return (
       <Container style={styles.container}>
-        <Text style={styles.Condition}>{this.props.textcondition}</Text>
-        <Image source={{uri:`http:${this.props.ic}`}} style={styles.icon}/>
+        <Text style={styles.Condition}>{this.props.text}</Text>
+        <Image source={{uri:`http:${this.props.icon}`}} style={styles.icon}/>
+        <Text style={styles.typesun}>{this.props.maxtemp_c}°C</Text>
       </Container>
     );
   }
@@ -21,8 +29,6 @@ const styles = StyleSheet.create({
     alignItems:'center',
     flexDirection:'column',
     backgroundColor:"transparent",
-    borderColor:'white',
-    borderWidth:1
   },
   Condition:{
     color:'white',
@@ -31,8 +37,19 @@ const styles = StyleSheet.create({
   },
   icon:{
     backgroundColor:'transparent',
-    margin:15,
+    marginTop:10,
     width:'30%',
     height:'30%'
+  },
+  typesun:{
+    marginTop:15,
+    color:'white',
+    fontSize:35,
+    fontWeight:'bold'
+  },
+  spinner:{
+    flex:1,
+    justifyContent:'center',
+    backgroundColor:'transparent'
   }
 })

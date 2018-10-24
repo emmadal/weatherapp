@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text} from 'react-native';
+import {StyleSheet, Text, ActivityIndicator} from 'react-native';
 import {Container,Spinner, Icon} from 'native-base'
 
 
@@ -8,6 +8,13 @@ export default class Localisation extends Component{
     super(props)
   }
   render() {
+    if(this.props.isLoading){
+      return(
+        <ActivityIndicator size="large" color="white" animating={this.props.isLoading}
+          style={styles.spinner}
+        />
+      )
+    }
     return (
       <Container style={styles.container}>
         <Icon type="FontAwesome" name="map-marker" style={styles.icons}/>
@@ -24,16 +31,14 @@ const styles = StyleSheet.create({
     alignItems:'center',
     flexDirection:'column',
     backgroundColor:"transparent",
-    borderColor:'white',
-    borderWidth:1
   },
   icons:{
     color:'white',
-    fontSize:100
+    fontSize:80
   },
   textCity:{
     color:'white',
-    fontSize:40,
+    fontSize:35,
     fontWeight:'bold'
   },
   textCountry:{
@@ -42,6 +47,11 @@ const styles = StyleSheet.create({
   },
   textregion:{
     color:'white',
-    fontSize:20
+    fontSize:25
+  },
+  spinner:{
+    flex:1,
+    justifyContent:'center',
+    backgroundColor:'transparent'
   }
 })
